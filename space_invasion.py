@@ -59,6 +59,13 @@ class SpaceInvasion:
             # Reset the game settings
             self.settings.initialize_dynamic_settings()
 
+            # Reset the game statistics.
+            self.stats.reset_stats()
+            self.sb.prep_score()
+            self.sb.prep_level()
+            self.sb.prep_ships()
+            self.game_active = True
+
     def _check_keydown_events(self, event):
         #Respond to key presses
         if event.key == pygame.K_RIGHT:
@@ -81,6 +88,10 @@ class SpaceInvasion:
 
             # Hide the mouse cursor
             pygame.mouse.set_visible(False)
+
+            # Increase level
+            self.stats.level += 1
+            self.sb.prep_level()
 
     def _ship_hit(self):
         #Respond to the ship being hit by an alien
