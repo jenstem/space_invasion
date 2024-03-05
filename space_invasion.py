@@ -5,6 +5,7 @@ import pygame
 from settings import Settings
 from game_stats import GameStats
 from scoreboard import Scoreboard
+from button import Button
 
 from ship import Ship
 
@@ -24,6 +25,9 @@ class SpaceInvasion:
 
         # Start Space Invasion in an inactive state
         self.game_active = False
+
+        # Play button
+        self.play_button = Button(self, "Play")
 
     def run_game(self):
         while True:
@@ -47,6 +51,13 @@ class SpaceInvasion:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 self._check_play_button(mouse_pos)
+
+    def _check_play_button(self, mouse_pos):
+        # Start a new game when the player clicks Play
+        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+        if button_clicked and not self.game_active:
+            # Reset the game settings
+            self.settings.initialize_dynamic_settings()
 
     def _check_keydown_events(self, event):
         #Respond to key presses
@@ -84,6 +95,10 @@ class SpaceInvasion:
 
         # Draw the score information
         self.sb.show_score()
+
+        # Draw the play button if the game is inactive
+        if not self.game_active:
+            self.play_button.draw_button()
 
 if __name__ == '__main__':
     ai = SpaceInvasion()
