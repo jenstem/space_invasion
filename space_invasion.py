@@ -8,6 +8,7 @@ from scoreboard import Scoreboard
 from button import Button
 
 from ship import Ship
+from bullet import Bullet
 
 class SpaceInvasion:
     def __init__(self):
@@ -22,6 +23,8 @@ class SpaceInvasion:
         self.stats = GameStats(self)
         self.sb = Scoreboard(self)
         self.ship = Ship(self)
+        # Group that holds the bullets
+        self.bullets = pygame.sprite.Group()
 
         # Start Space Invasion in an inactive state
         self.game_active = False
@@ -35,6 +38,7 @@ class SpaceInvasion:
 
             if self.game_active:
                 self.ship.update()
+                self._update_bullets()
 
             self._update_screen()
             self.clock.tick(60)
@@ -66,6 +70,12 @@ class SpaceInvasion:
             self.sb.prep_ships()
             self.game_active = True
 
+            # Get rid of any remaining bullets
+            self.bullets.empty()
+
+            # Center the ship
+            self.ship.center_ship()
+
     def _check_keydown_events(self, event):
         #Respond to key presses
         if event.key == pygame.K_RIGHT:
@@ -74,6 +84,9 @@ class SpaceInvasion:
             self.ship.moving_left = True
         elif event.key == pygame.K_q:
             sys.exit()
+        # Fire a bullet when the space bar is pressed
+        elif event.key == pygame.K_SPACE:
+            self._fire_bullet()
 
     def _check_keyup_events(self, event):
         # Respond to key releases
@@ -93,6 +106,21 @@ class SpaceInvasion:
             self.stats.level += 1
             self.sb.prep_level()
 
+    def _fire_bullet(self):
+        # Add new bullets to the bullets group
+        if len(self.bullets) < self.settings.bullets_allowed:
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
+
+    def _update_bullets(self):
+            # Update bullet positions
+            self.bullets.update()
+
+            # Get rid of bullets that have disappeared
+            for bullet in self.bullets.copy():
+                if bullet.rect.bottom <= 0:
+                    self.bullets.remove(bullet)
+
     def _ship_hit(self):
         #Respond to the ship being hit by an alien
         if self.stats.ships_left > 0:
@@ -100,9 +128,16 @@ class SpaceInvasion:
             self.stats.ships_left -= 1
             self.sb.prep_ships()
 
+            # Get rid of any remaining bullets
+            self.bullets.empty()
+
     def _update_screen(self):
         # Update images on the screen
         self.screen.fill(self.settings.bg_color)
+
+        self.ship.blitme()
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
 
         # Draw the score information
         self.sb.show_score()
