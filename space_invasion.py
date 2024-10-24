@@ -13,7 +13,13 @@ from alien import Alien
 
 
 class SpaceInvasion:
+    """
+    A class to manage the game resources and behavior for Space Invasion.
+    """
     def __init__(self):
+        """
+        Initialize the game and create game resources.
+        """
         pygame.init()
 
         self.clock = pygame.time.Clock()
@@ -38,6 +44,9 @@ class SpaceInvasion:
         self.play_button = Button(self, "Play")
 
     def run_game(self):
+        """
+        Start the main loop for the game.
+        """
         while True:
             self._check_events()
 
@@ -50,7 +59,9 @@ class SpaceInvasion:
             self.clock.tick(60)
 
     def _check_events(self):
-        # Respond to keypresses and mouse events
+        """
+        Respond to keypresses and mouse events.
+        """
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
@@ -63,7 +74,9 @@ class SpaceInvasion:
                 self._check_play_button(mouse_pos)
 
     def _check_play_button(self, mouse_pos):
-        # Start a new game when the player clicks Play
+        """
+        Start a new game when the player clicks Play.
+        """
         button_clicked = self.play_button.rect.collidepoint(mouse_pos)
         if button_clicked and not self.game_active:
             # Reset the game settings
@@ -88,7 +101,9 @@ class SpaceInvasion:
             pygame.mouse.set_visible(False)
 
     def _check_keydown_events(self, event):
-        #Respond to key presses
+        """
+        Respond to key presses.
+        """
         if event.key == pygame.K_RIGHT:
             self.ship.moving_right = True
         elif event.key == pygame.K_LEFT:
@@ -100,21 +115,27 @@ class SpaceInvasion:
             self._fire_bullet()
 
     def _check_keyup_events(self, event):
-        # Respond to key releases
+        """
+        Respond to key releases.
+        """
         if event.key == pygame.K_RIGHT:
             self.ship.moving_right = False
         elif event.key == pygame.K_LEFT:
             self.ship.moving_left = False
 
     def _fire_bullet(self):
-        # Add new bullets to the bullets group
+        """
+        Add a new bullet to the bullets group.
+        """
         if len(self.bullets) < self.settings.bullets_allowed:
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
 
     def _update_bullets(self):
-            # Update bullet positions
-            self.bullets.update()
+        """
+        Update bullet positions and check for collisions.
+        """
+        self.bullets.update()
 
             # Get rid of bullets that have disappeared
             for bullet in self.bullets.copy():
@@ -124,7 +145,9 @@ class SpaceInvasion:
             self._check_bullet_alien_collisions()
 
     def _check_bullet_alien_collisions(self):
-            # Remove any bullets and aliens that have collided
+            """
+            Check for collisions between bullets and aliens.
+            """
             collisions = pygame.sprite.groupcollide(
                 self.bullets, self.aliens, True, True)
 
@@ -145,7 +168,9 @@ class SpaceInvasion:
                 self.sb.prep_level()
 
     def _ship_hit(self):
-        #Respond to the ship being hit by an alien
+        """
+        Respond to the ship being hit by an alien.
+        """
         if self.stats.ships_left > 0:
         # Decrement ships_left and update scoreboard
             self.stats.ships_left -= 1
@@ -166,7 +191,9 @@ class SpaceInvasion:
             pygame.mouse.set_visible(True)
 
     def _update_aliens(self):
-        # Update the positions of all aliens in the fleet
+        """
+        Update the positions of all aliens in the fleet.
+        """
         self._check_fleet_edges()
         self.aliens.update()
 
@@ -178,14 +205,18 @@ class SpaceInvasion:
         self._check_aliens_bottom()
 
     def _check_aliens_bottom(self):
-        # Check if any aliens have reached the bottom of the screen
+        """
+        Check if any aliens have reached the bottom of the screen.
+        """
         for alien in self.aliens.sprites():
             if alien.rect.bottom >= self.settings.screen_height:
                 self._ship_hit()
                 break
 
     def _create_fleet(self):
-        # Create an alien fleet
+        """
+        Create an alien fleet.
+        """
         alien = Alien(self)
         alien_width, alien_height = alien.rect.size
         available_space_x = self.settings.screen_width - int(2 * alien_width)
@@ -202,20 +233,26 @@ class SpaceInvasion:
                 self._create_alien(alien_number, row_number)
 
     def _check_fleet_edges(self):
-        # Respond appropriately if any aliens have reached an edge
+        """
+        Respond appropriately if any aliens have reached an edge.
+        """
         for alien in self.aliens.sprites():
             if alien.check_edges():
                 self._change_fleet_direction()
                 break
 
     def _change_fleet_direction(self):
-        # Drop the entire fleet and change the fleet's direction
+        """
+        Drop the entire fleet and change the fleet's direction.
+        """
         for alien in self.aliens.sprites():
             alien.rect.y += self.settings.fleet_drop_speed
         self.settings.fleet_direction *= -1
 
     def _create_alien(self, alien_number, row_number):
-            # Create an alien and place it in the row
+            """
+            Create an alien and place it in the row
+            """
             alien = Alien(self)
             alien_width, alien_height = alien.rect.size
             alien.x = alien_width + 2 * alien_width * alien_number
@@ -224,7 +261,9 @@ class SpaceInvasion:
             self.aliens.add(alien)
 
     def _update_screen(self):
-        # Update images on the screen
+        """
+        Update images on the screen
+        """
         self.screen.fill(self.settings.bg_color)
 
         self.ship.blitme()
